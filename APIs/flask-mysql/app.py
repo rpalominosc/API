@@ -85,6 +85,22 @@ def delete_author_by_id(id):
   db.session.commit()
   return make_response("",204)
 
+@app.route('/authors/<id>', methods = ['PUT'])
+def update_author_by_id(id):
+  data = request.get_json()
+  get_author = Authors.query.get(id)
+  if data.get('specialisation'):
+    get_author.specialisation = data['specialisation']
+  if data.get('name'):
+    get_author.name = data['name']
+
+  db.session.add(get_author)
+  db.session.commit()
+  author_schema = AuthorsSchema(only=['id', 'name', 'specialisation'])
+  author = author_schema.dump(get_author)
+  return make_response(jsonify({"author": author}))
+
+
 ##
 if __name__ == "__main__":
   app.run(debug=True)
